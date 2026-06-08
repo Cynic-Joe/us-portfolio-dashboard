@@ -1,0 +1,29 @@
+name: Update Finnhub Quotes
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-quotes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch quotes
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python fetch_quotes.py
+      - name: Commit quote update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quotes/latest.json
+          git diff --cached --quiet && echo "No quote changes" || git commit -m "Update quotes"
+          git push
