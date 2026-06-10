@@ -54,8 +54,13 @@
     .name { color: var(--muted); font-size: 12px; margin-top: 2px; }
     .bar { height: 10px; background: #0b1020; border: 1px solid #202a3d; border-radius: 999px; overflow: hidden; }
     .bar > i { display: block; height: 100%; width: var(--w); background: linear-gradient(90deg, var(--accent-2), var(--accent)); border-radius: inherit; }
-    .group-row { display: grid; grid-template-columns: 110px 1fr 76px 88px 92px; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .group-row { display: grid; grid-template-columns: 130px 1fr 76px 88px 92px 36px; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
     .group-row:last-child { border-bottom: 0; }
+    .group-name-input { background: transparent; border: 1px solid transparent; color: var(--text); font-weight: 700; padding: 4px 6px; border-radius: 6px; cursor: text; }
+    .group-name-input:hover { border-color: var(--line); }
+    .group-name-input:focus { border-color: var(--accent-2); background: #0c111b; }
+    .group-del-btn { background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; border-radius: 8px; font-size: 16px; line-height: 1; padding: 4px; transition: .15s; }
+    .group-del-btn:hover { color: var(--bad); border-color: var(--bad); }
     .section-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
     .section-head h2 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
     .note { color: var(--muted); font-size: 13px; line-height: 1.55; }
@@ -64,7 +69,7 @@
     .rule b { color: var(--text); }
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .textarea { min-height: 110px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    @media (max-width: 980px) { .span-3,.span-4,.span-5,.span-7,.span-8 { grid-column: span 12; } header { flex-direction: column; } .actions { justify-content: flex-start; } .group-row { grid-template-columns: 92px 1fr 58px 72px 78px; } }
+    @media (max-width: 980px) { .span-3,.span-4,.span-5,.span-7,.span-8 { grid-column: span 12; } header { flex-direction: column; } .actions { justify-content: flex-start; } .group-row { grid-template-columns: 100px 1fr 58px 72px 78px 30px; } }
   </style>
 </head>
 <body>
@@ -87,23 +92,10 @@
     <section class="grid" id="metrics"></section>
 
     <section class="grid" style="margin-top:14px">
-      <div class="card pad span-7">
-        <div class="section-head"><h2>目标配比</h2><span class="pill">可直接改百分比</span></div>
+      <div class="card pad span-12">
+        <div class="section-head"><h2>目标配比</h2><span class="pill">点击名称可编辑，支持增删分组</span></div>
         <div id="groups"></div>
-      </div>
-      <div class="card pad span-5">
-        <div class="section-head"><h2>六月风控框架</h2><span class="pill">手动更新</span></div>
-        <div class="split">
-          <label class="note">VIX<input id="vix" type="number" step="0.01"></label>
-          <label class="note">10Y 美债 %<input id="yield10y" type="number" step="0.01"></label>
-        </div>
-        <div style="height:10px"></div>
-        <div class="split">
-          <label class="note">自动刷新分钟<input id="refreshMinutes" type="number" min="0" step="1"></label>
-          <label class="note">更新状态<input id="quoteStatus" readonly></label>
-        </div>
-        <div style="height:10px"></div>
-        <div class="rules" id="riskRules"></div>
+        <div style="margin-top:12px"><button class="btn" id="addGroup">+ 新增分组</button></div>
       </div>
     </section>
 
@@ -152,18 +144,13 @@
     const defaultState = {
       cash: 569.19,
       fee: 1,
-      refreshMinutes: 0,
-      quoteStatus: '未更新',
-      vix: 21.51,
-      yield10y: 4.47,
-      notes: '目标：60% SPMO / 8% NOW+SPCE或短期热门 / 14% MU+DRAM / 5% NOK / 5% XMHQ / 8%现金。\n分批补仓时，后一笔只有在价格优势能覆盖额外 $1 平台费时才有经济意义。',
+      notes: '目标：60% SPMO / 8% NOW+SPCE或短期热门 / 14% MU+DRAM / 5% NOK / 13%现金。\n分批补仓时，后一笔只有在价格优势能覆盖额外 $1 平台费时才有经济意义。',
       groups: [
         { id:'spmo', label:'SPMO', target:60 },
         { id:'hot', label:'NOW/SPCE/热门', target:8 },
         { id:'storage', label:'MU+DRAM', target:14 },
         { id:'nok', label:'NOKIA', target:5 },
-        { id:'xmhq', label:'XMHQ', target:5 },
-        { id:'cash', label:'现金防御', target:8 }
+        { id:'cash', label:'现金防御', target:13 }
       ],
       holdings: [
         { ticker:'SPMO', name:'Invesco S&P 500 Momentum ETF', group:'spmo', qty:3.639, cost:154, price:144.28, deferShares:1, lastDecision:144.28 },
@@ -171,13 +158,11 @@
         { ticker:'MU', name:'Micron Technology', group:'storage', qty:0.0694, cost:1044.55, price:864.01, deferShares:0, lastDecision:864.01 },
         { ticker:'NOW', name:'ServiceNow', group:'hot', qty:0.52, cost:132, price:132, deferShares:0, lastDecision:132 },
         { ticker:'SPCE', name:'Virgin Galactic / hot bucket', group:'hot', qty:0, cost:0, price:0, manualValue:28.84, deferShares:0, lastDecision:0 },
-        { ticker:'NOK', name:'Nokia', group:'nok', qty:2, cost:14.38, price:14.38, deferShares:2, lastDecision:14.38 },
-        { ticker:'XMHQ', name:'Invesco S&P MidCap Quality ETF', group:'xmhq', qty:0, cost:0, price:0, deferShares:0, lastDecision:0 }
+        { ticker:'NOK', name:'Nokia', group:'nok', qty:4, cost:14.175, price:14.38, deferShares:2, lastDecision:14.38 }
       ]
     };
 
     let state = load();
-    let refreshTimer = null;
     const $ = id => document.getElementById(id);
     const fmt = n => Number.isFinite(n) ? n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
     const pct = n => Number.isFinite(n) ? `${n.toFixed(1)}%` : '—';
@@ -194,23 +179,15 @@
     function groupValue(id){ return id==='cash' ? Number(state.cash||0) : state.holdings.filter(h=>h.group===id).reduce((s,h)=>s+valueOf(h),0); }
 
     function bindTopInputs(){
-      $('cash').value = state.cash; $('fee').value = state.fee; $('vix').value = state.vix; $('yield10y').value = state.yield10y; $('notes').value = state.notes || '';
-      $('refreshMinutes').value = state.refreshMinutes || 0; $('quoteStatus').value = state.quoteStatus || '未更新';
-      ['cash','fee','vix','yield10y','refreshMinutes','notes'].forEach(id => $(id).oninput = e => {
-        state[id === 'yield10y' ? 'yield10y' : id] = id==='notes' ? e.target.value : Number(e.target.value);
-        if (id === 'refreshMinutes') setupAutoRefresh();
+      $('cash').value = state.cash; $('fee').value = state.fee; $('notes').value = state.notes || '';
+      ['cash','fee','notes'].forEach(id => $(id).oninput = e => {
+        state[id] = id==='notes' ? e.target.value : Number(e.target.value);
         render();
       });
     }
 
-    function setupAutoRefresh(){
-      if (refreshTimer) clearInterval(refreshTimer);
-      const mins = Number(state.refreshMinutes || 0);
-      if (mins > 0) refreshTimer = setInterval(refreshQuotes, mins * 60 * 1000);
-    }
-
     async function refreshQuotes(){
-      const alwaysTrack = new Set(['SPMO','DRAM','NOK','MU','NOW','XMHQ']);
+      const alwaysTrack = new Set(['SPMO','DRAM','NOK','MU','NOW']);
       const symbols = [...new Set(state.holdings
         .map(h => String(h.ticker||'').trim().toUpperCase())
         .filter(t => t && !['CASH','SPCE'].includes(t))
@@ -270,18 +247,54 @@
       $('groups').innerHTML = state.groups.map((g,i)=>{
         const val = groupValue(g.id), actual = total?val/total*100:0, gap = total*(Number(g.target||0)/100)-val;
         return `<div class="group-row">
-          <b>${g.label}</b>
+          <input class="group-name-input" value="${g.label}" data-group-rename="${i}" title="点击编辑分组名称">
           <div class="bar" title="当前 ${pct(actual)} / 目标 ${g.target}%"><i style="--w:${Math.min(100, Math.max(0, actual/(Number(g.target||1))*100))}%"></i></div>
           <input type="number" step="0.1" value="${g.target}" data-group-target="${i}">
           <span>${pct(actual)}</span>
           <span class="${gap>=0?'good':'bad'}">${gap>=0?'+':''}$${fmt(gap)}</span>
+          <button class="group-del-btn" data-group-del="${i}" title="删除分组">×</button>
         </div>`;
       }).join('');
-      document.querySelectorAll('[data-group-target]').forEach(el => el.oninput = e => { state.groups[Number(e.target.dataset.groupTarget)].target = Number(e.target.value); render(); });
+      document.querySelectorAll('[data-group-target]').forEach(el => el.oninput = e => {
+        state.groups[Number(e.target.dataset.groupTarget)].target = Number(e.target.value);
+        syncComputedValues();
+      });
+      document.querySelectorAll('[data-group-rename]').forEach(el => {
+        el.oninput = e => {
+          const idx = Number(e.target.dataset.groupRename);
+          state.groups[idx].label = e.target.value;
+          // Update holdings select dropdowns without full re-render
+          document.querySelectorAll('[data-field="group"]').forEach(sel => {
+            const i = Number(sel.dataset.i);
+            sel.innerHTML = state.groups.map(g=>`<option value="${g.id}" ${g.id===state.holdings[i]?.group?'selected':''}>${g.label}</option>`).join('');
+          });
+          syncComputedValues();
+        };
+      });
+      document.querySelectorAll('[data-group-del]').forEach(el => el.onclick = e => {
+        const idx = Number(e.target.dataset.groupDel);
+        const g = state.groups[idx];
+        if (g.id === 'cash') { alert('现金防御分组不能删除'); return; }
+        const affectedHoldings = state.holdings.filter(h => h.group === g.id);
+        if (affectedHoldings.length > 0) {
+          if (!confirm(`分组"${g.label}"下有 ${affectedHoldings.length} 个持仓，删除后这些持仓将变为无分组。确定删除？`)) return;
+          affectedHoldings.forEach(h => h.group = '');
+        }
+        state.groups.splice(idx, 1);
+        render();
+      });
+    }
+
+    function addGroup(){
+      const id = 'group_' + Date.now();
+      state.groups.push({ id, label:'新分组', target:0 });
+      render();
     }
 
     function renderHoldings(){
       const total = totalValue();
+      const active = document.activeElement;
+      const focusInfo = active?.dataset ? { field: active.dataset.field, i: active.dataset.i, groupTarget: active.dataset.groupTarget, groupRename: active.dataset.groupRename, selStart: active.selectionStart } : null;
       $('holdings').innerHTML = state.holdings.map((h,i)=>{
         const val = valueOf(h), costVal = costValueOf(h), pnl = val - costVal;
         const group = state.groups.find(g=>g.id===h.group);
@@ -309,13 +322,45 @@
         render();
       });
       document.querySelectorAll('[data-del]').forEach(el => el.onclick = e => { state.holdings.splice(Number(e.target.dataset.del),1); render(); });
+      // Restore focus after re-render
+      if (focusInfo && focusInfo.field) {
+        const el = document.querySelector(`[data-field="${focusInfo.field}"][data-i="${focusInfo.i}"]`);
+        if (el) { el.focus(); if (typeof focusInfo.selStart === 'number' && el.setSelectionRange) try { el.setSelectionRange(focusInfo.selStart, focusInfo.selStart); } catch{} }
+      }
     }
 
-    function renderRisk(){
-      const vix = Number(state.vix||0), y = Number(state.yield10y||0);
-      const vixText = vix < 20 ? ['good','VIX < 20：系统性风险缓和'] : vix > 23 ? ['bad','VIX > 23：踩踏风险仍高，反弹偏减仓'] : ['warn','VIX 20–23：风险未解除，等待确认'];
-      const yText = y < 4.5 ? ['good','10Y < 4.5%：利率压力暂缓'] : ['bad','10Y ≥ 4.5%：科技/半导体估值继续承压'];
-      $('riskRules').innerHTML = [vixText,yText,['warn','CPI/FOMC/OpEx 前不打光现金；反弹不是自动追涨信号。']].map(r=>`<div class="rule"><b class="${r[0]}">${r[1]}</b></div>`).join('');
+    /* Targeted sync: update only computed display values without rebuilding inputs */
+    function syncComputedValues(){
+      renderMetrics();
+      // Update group bars/percentages/gaps (only text nodes, not inputs)
+      const total = totalValue();
+      document.querySelectorAll('.group-row').forEach((row, i) => {
+        const g = state.groups[i]; if (!g) return;
+        const val = groupValue(g.id), actual = total?val/total*100:0, gap = total*(Number(g.target||0)/100)-val;
+        const bar = row.querySelector('.bar i');
+        if (bar) bar.style.setProperty('--w', Math.min(100, Math.max(0, actual/(Number(g.target||1))*100)) + '%');
+        const spans = row.querySelectorAll('span');
+        if (spans[0]) spans[0].textContent = pct(actual);
+        if (spans[1]) { spans[1].textContent = `${gap>=0?'+':''}$${fmt(gap)}`; spans[1].className = gap>=0?'good':'bad'; }
+      });
+      // Update holdings table computed cells
+      document.querySelectorAll('#holdings tr').forEach((tr, i) => {
+        const h = state.holdings[i]; if (!h) return;
+        const val = valueOf(h), costVal = costValueOf(h), pnl = val - costVal;
+        const group = state.groups.find(g=>g.id===h.group);
+        const gVal = groupValue(h.group), gap = group ? total*(group.target/100)-gVal : 0;
+        const suggestedShares = h.price > 0 && gap > 0 ? gap / h.price : 0;
+        const threshold = Number(h.deferShares||0) > 0 ? Number(state.fee||0)/Number(h.deferShares) : 0;
+        const usefulBelow = Number(h.lastDecision||0) > 0 && threshold ? Number(h.lastDecision)-threshold : null;
+        const tds = tr.querySelectorAll('td');
+        if (tds[5]) tds[5].textContent = `$${fmt(val)}`;
+        if (tds[6]) { tds[6].textContent = `${pnl>=0?'+':''}$${fmt(pnl)}`; tds[6].className = pnl>=0?'good':'bad'; }
+        if (tds[7]) { tds[7].textContent = `${gap>=0?'+':''}$${fmt(gap)}`; tds[7].className = gap>=0?'good':'bad'; }
+        if (tds[8]) tds[8].textContent = suggestedShares>0 ? suggestedShares.toFixed(3) : '—';
+        if (tds[9]) { const noteDiv = tds[9].querySelector('.note'); if (noteDiv) { noteDiv.innerHTML = `待补股数 <input type="number" step="0.01" value="${h.deferShares||0}" data-field="deferShares" data-i="${i}">参考价 <input type="number" step="0.01" value="${h.lastDecision||0}" data-field="lastDecision" data-i="${i}">${usefulBelow ? `≤ $${fmt(usefulBelow)}` : '—'}`; noteDiv.querySelectorAll('input').forEach(el => el.oninput = e => { const fi = Number(e.target.dataset.i), ff = e.target.dataset.field; state.holdings[fi][ff] = Number(e.target.value); render(); }); } }
+      });
+      renderSuggestions();
+      save();
     }
 
     function renderSuggestions(){
@@ -336,21 +381,21 @@
     }
 
     function render(){
-      renderMetrics(); bindTopInputs(); renderGroups(); renderHoldings(); renderRisk(); renderSuggestions(); save();
+      renderMetrics(); bindTopInputs(); renderGroups(); renderHoldings(); renderSuggestions(); save();
     }
 
     $('saveBtn').onclick = () => { save(); alert('已保存到本机浏览器 localStorage'); };
     $('refreshQuotes').onclick = refreshQuotes;
     $('resetBtn').onclick = () => { if(confirm('确定重置为默认数据？')) { state = structuredClone(defaultState); render(); } };
-    $('addRow').onclick = () => { state.holdings.push({ticker:'NEW', name:'', group:'hot', qty:0, cost:0, price:0, deferShares:0, lastDecision:0}); render(); };
+    $('addRow').onclick = () => { state.holdings.push({ticker:'NEW', name:'', group: state.groups[0]?.id || '', qty:0, cost:0, price:0, deferShares:0, lastDecision:0}); render(); };
     $('exportBtn').onclick = async () => { await navigator.clipboard.writeText(JSON.stringify(state,null,2)); alert('JSON 已复制到剪贴板'); };
     $('importBtn').onclick = () => {
       const raw = prompt('粘贴导出的 JSON');
       if (!raw) return;
       try { state = JSON.parse(raw); render(); } catch(e) { alert('JSON 格式错误'); }
     };
+    $('addGroup').onclick = addGroup;
     render();
-    setupAutoRefresh();
   </script>
 </body>
 </html>
