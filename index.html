@@ -61,6 +61,13 @@
     .group-name-input:focus { border-color: var(--accent-2); background: #0c111b; }
     .group-del-btn { background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; border-radius: 8px; font-size: 16px; line-height: 1; padding: 4px; transition: .15s; }
     .group-del-btn:hover { color: var(--bad); border-color: var(--bad); }
+    .ind-card { background: rgba(255,255,255,.025); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+    .ind-head { display: flex; justify-content: space-between; align-items: center; }
+    .ind-label { color: var(--muted); font-size: 12px; font-weight: 600; }
+    .ind-value { font-size: 22px; font-weight: 720; letter-spacing: -0.02em; }
+    .ind-signal { font-size: 11px; line-height: 1.4; margin-top: 2px; }
+    .fx-toggle { background: transparent; border: 1px solid var(--line); color: var(--accent-2); font-size: 11px; padding: 2px 8px; border-radius: 6px; cursor: pointer; transition: .15s; white-space: nowrap; }
+    .fx-toggle:hover { border-color: var(--accent-2); background: rgba(96,165,250,.08); }
     .section-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
     .section-head h2 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
     .note { color: var(--muted); font-size: 13px; line-height: 1.55; }
@@ -90,6 +97,11 @@
     </header>
 
     <section class="grid" id="metrics"></section>
+
+    <section class="card pad span-12" style="margin-top:14px">
+      <div class="section-head"><h2>市场指标</h2><span class="pill">点击刷新按钮更新 · 汇率可切换方向</span></div>
+      <div id="indicators" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;"></div>
+    </section>
 
     <section class="grid" style="margin-top:14px">
       <div class="card pad span-12">
@@ -385,7 +397,7 @@
     }
 
     $('saveBtn').onclick = () => { save(); alert('已保存到本机浏览器 localStorage'); };
-    $('refreshQuotes').onclick = refreshQuotes;
+    $('refreshQuotes').onclick = async () => { await refreshQuotes(); await fetchMarketData(); };
     $('resetBtn').onclick = () => { if(confirm('确定重置为默认数据？')) { state = structuredClone(defaultState); render(); } };
     $('addRow').onclick = () => { state.holdings.push({ticker:'NEW', name:'', group: state.groups[0]?.id || '', qty:0, cost:0, price:0, deferShares:0, lastDecision:0}); render(); };
     $('exportBtn').onclick = async () => { await navigator.clipboard.writeText(JSON.stringify(state,null,2)); alert('JSON 已复制到剪贴板'); };
@@ -395,7 +407,128 @@
       try { state = JSON.parse(raw); render(); } catch(e) { alert('JSON 格式错误'); }
     };
     $('addGroup').onclick = addGroup;
+
+    /* ========== Market Indicators Module ========== */
+    const FX_KEY = 'portfolio_fx_dirs';
+    let marketData = { '^VIX': null, UUP: null, SOXX: null, USDCNY: null, USDHKD: null, yield10y: null };
+    let fxDirs = JSON.parse(localStorage.getItem(FX_KEY) || '{}');
+
+    async function fetchMarketData() {
+      const indEl = $('indicators');
+      if (indEl) indEl.querySelectorAll('.ind-value').forEach(el => el.textContent = '…');
+      // 1) Try to load from quotes/latest.json (includes VIX, UUP, SOXX, forex, yield)
+      try {
+        const isLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+        if (isLocal) {
+          try {
+            const local = await fetch('/api/quotes');
+            if (local.ok) { const d = await local.json(); mergeMarketData(d); return; }
+          } catch {}
+        }
+        const res = await fetch('quotes/latest.json?ts=' + Date.now());
+        if (res.ok) { const d = await res.json(); mergeMarketData(d); }
+      } catch(e) { console.warn('market data fetch failed', e); }
+      // 2) Also try live forex from frankfurter
+      try {
+        const fxRes = await fetch('https://api.frankfurter.app/latest?from=USD&to=CNY,HKD');
+        if (fxRes.ok) {
+          const fxData = await fxRes.json();
+          if (fxData.rates) {
+            if (fxData.rates.CNY) marketData.USDCNY = fxData.rates.CNY;
+            if (fxData.rates.HKD) marketData.USDHKD = fxData.rates.HKD;
+          }
+        }
+      } catch {}
+      renderIndicators();
+    }
+
+    function mergeMarketData(d) {
+      const q = d.quotes || {};
+      if (q['^VIX']?.c) marketData['^VIX'] = q['^VIX'].c;
+      if (q['UUP']?.c) marketData.UUP = q['UUP'].c;
+      if (q['SOXX']?.c) marketData.SOXX = q['SOXX'].c;
+      const m = d.market || {};
+      if (m.USDCNY) marketData.USDCNY = m.USDCNY;
+      if (m.USDHKD) marketData.USDHKD = m.USDHKD;
+      if (m.yield10y) marketData.yield10y = m.yield10y;
+      renderIndicators();
+    }
+
+    function interpretSignal(key, val) {
+      if (val == null || isNaN(val)) return { color: 'muted', text: '数据加载中' };
+      switch(key) {
+        case 'vix':
+          if (val < 15) return { color:'good', text:'波动率低位，市场平静' };
+          if (val < 20) return { color:'good', text:'波动率正常' };
+          if (val < 23) return { color:'warn', text:'波动偏高，注意风险' };
+          return { color:'bad', text:'高波动，踩踏风险大' };
+        case '10y':
+          if (val < 4.0) return { color:'good', text:'利率温和，利好成长股' };
+          if (val < 4.5) return { color:'warn', text:'利率偏高，估值承压' };
+          return { color:'bad', text:'高利率，科技/半导体承压' };
+        case 'dxy':
+          if (val < 100) return { color:'good', text:'美元偏弱，利好非美' };
+          if (val < 104) return { color:'warn', text:'美元中性区间' };
+          return { color:'bad', text:'美元走强，新兴市场承压' };
+        case 'sox':
+          return { color:'muted', text:'半导体板块风向标' };
+        default:
+          return { color:'muted', text:'' };
+      }
+    }
+
+    function renderIndicators() {
+      const el = $('indicators');
+      if (!el) return;
+      const vixVal = marketData['^VIX'];
+      const dxyVal = marketData.UUP ? marketData.UUP * 1.127 : null; // UUP ≈ DXY / 1.127 近似换算
+      const soxVal = marketData.SOXX;
+
+      // FX pairs with direction toggle
+      const fxPairs = [
+        { key:'cnyusd', baseVal: marketData.USDCNY, invLabel:'USD/CNY', stdLabel:'CNY/USD', decimals:4 },
+        { key:'hkdusd', baseVal: marketData.USDHKD, invLabel:'USD/HKD', stdLabel:'HKD/USD', decimals:4 },
+        { key:'cnyhkd', baseVal: marketData.USDCNY && marketData.USDHKD ? marketData.USDHKD/marketData.USDCNY : null, invLabel:'CNY/HKD', stdLabel:'HKD/CNY', decimals:4 },
+      ];
+
+      let html = '';
+      // VIX
+      const vixSig = interpretSignal('vix', vixVal);
+      html += `<div class="ind-card"><div class="ind-head"><span class="ind-label">VIX</span></div><div class="ind-value ${vixSig.color}">${vixVal!=null ? vixVal.toFixed(2) : '—'}</div><div class="ind-signal ${vixSig.color}">${vixSig.text}</div></div>`;
+      // 10Y
+      const yieldVal = marketData.yield10y;
+      const yieldSig = interpretSignal('10y', yieldVal);
+      html += `<div class="ind-card"><div class="ind-head"><span class="ind-label">10Y 美债</span></div><div class="ind-value ${yieldSig.color}">${yieldVal!=null ? yieldVal.toFixed(2)+'%' : '—'}</div><div class="ind-signal ${yieldSig.color}">${yieldSig.text}</div></div>`;
+      // DXY
+      const dxySig = interpretSignal('dxy', dxyVal);
+      html += `<div class="ind-card"><div class="ind-head"><span class="ind-label">DXY 美元</span></div><div class="ind-value ${dxySig.color}">${dxyVal!=null ? dxyVal.toFixed(1) : '—'}</div><div class="ind-signal ${dxySig.color}">${dxySig.text}</div></div>`;
+      // SOX
+      const soxSig = interpretSignal('sox', soxVal);
+      html += `<div class="ind-card"><div class="ind-head"><span class="ind-label">SOX 半导体</span></div><div class="ind-value">${soxVal!=null ? soxVal.toFixed(2) : '—'}</div><div class="ind-signal ${soxSig.color}">${soxSig.text}</div></div>`;
+      // FX pairs
+      for (const fx of fxPairs) {
+        const dir = fxDirs[fx.key] || 'inv'; // default: show inverse (e.g. USD/CNY)
+        let displayVal = null, label = '';
+        if (fx.baseVal != null) {
+          if (dir === 'std') { displayVal = 1/fx.baseVal; label = fx.stdLabel; }
+          else { displayVal = fx.baseVal; label = fx.invLabel; }
+        }
+        html += `<div class="ind-card"><div class="ind-head"><span class="ind-label">${label}</span><button class="fx-toggle" data-fx-toggle="${fx.key}">⇄</button></div><div class="ind-value">${displayVal!=null ? displayVal.toFixed(fx.decimals) : '—'}</div><div class="ind-signal muted">${fx.key==='cnyhkd'?'交叉汇率':'点击 ⇄ 切换方向'}</div></div>`;
+      }
+      el.innerHTML = html;
+      // Bind toggle buttons
+      el.querySelectorAll('[data-fx-toggle]').forEach(btn => {
+        btn.onclick = () => {
+          const k = btn.dataset.fxToggle;
+          fxDirs[k] = (fxDirs[k] || 'inv') === 'inv' ? 'std' : 'inv';
+          localStorage.setItem(FX_KEY, JSON.stringify(fxDirs));
+          renderIndicators();
+        };
+      });
+    }
+
     render();
+    fetchMarketData();
   </script>
 </body>
 </html>
