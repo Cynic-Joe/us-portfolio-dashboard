@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Jake 美股交易计划 Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a12;
+      --panel: #101624;
+      --panel-2: #151d2e;
+      --line: rgba(148, 163, 184, .18);
+      --text: #eef4ff;
+      --muted: #94a3b8;
+      --soft: #cbd5e1;
+      --blue: #60a5fa;
+      --cyan: #22d3ee;
+      --gold: #fbbf24;
+      --green: #22c55e;
+      --red: #ef4444;
+      --shadow: 0 22px 70px rgba(0, 0, 0, .38);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% -10%, rgba(96, 165, 250, .25), transparent 34rem),
+        radial-gradient(circle at 95% 10%, rgba(34, 211, 238, .15), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      width: min(1040px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 22px 0 42px;
+    }
+
+    header {
+      display: grid;
+      gap: 14px;
+      padding: 18px 0 14px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 8vw, 54px);
+      line-height: .96;
+      letter-spacing: -.055em;
+    }
+
+    .sub {
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015)), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .pad { padding: 16px; }
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-12 { grid-column: span 12; }
+
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric { margin-top: 7px; font-size: 28px; font-weight: 820; letter-spacing: -.035em; }
+    .metric small { color: var(--muted); font-size: 13px; font-weight: 600; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 0;
+    }
+
+    .section-title h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+    .pill {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: var(--soft);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .table-wrap { overflow-x: auto; padding: 10px 12px 14px; }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    th, td { padding: 12px 9px; border-bottom: 1px solid rgba(255,255,255,.075); text-align: right; }
+    th { color: var(--muted); font-size: 12px; font-weight: 750; }
+    td { font-size: 14px; }
+    th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+    tr:last-child td { border-bottom: 0; }
+
+    .ticker { font-weight: 850; letter-spacing: .03em; font-size: 15px; }
+    .tag { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .buy { color: var(--gold); font-weight: 850; font-size: 16px; }
+    .cash { color: var(--green); font-weight: 850; }
+    .muted { color: var(--muted); }
+
+    .mobile-list { display: none; gap: 10px; padding: 12px; }
+    .row-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(255,255,255,.03);
+    }
+    .row-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .row-buy { text-align: right; }
+    .row-buy .buy { font-size: 21px; display: block; }
+    .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .kv div { border-radius: 12px; background: rgba(15, 23, 42, .7); padding: 8px; }
+    .kv b { display: block; font-size: 12px; color: var(--muted); font-weight: 650; }
+    .kv span { display: block; margin-top: 3px; font-size: 13px; color: var(--text); font-weight: 720; }
+
+    .note-box {
+      display: grid;
+      gap: 10px;
+      color: var(--soft);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .note-box b { color: var(--text); }
+
+    footer { color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 14px; }
+
+    @media (max-width: 760px) {
+      .wrap { width: min(100vw - 18px, 520px); padding-top: 10px; }
+      header { padding-top: 12px; }
+      .span-3, .span-4 { grid-column: span 6; }
+      .metric { font-size: 22px; }
+      .section-title { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .table-wrap { display: none; }
+      .mobile-list { display: grid; }
+      .kv { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 420px) {
+      .span-3, .span-4 { grid-column: span 12; }
+      .kv { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="eyebrow">Trading Plan · Chief / Schwab pending</div>
+      <h1>原组合补仓计划</h1>
+      <p class="sub">只使用原本子弹仓 $433.71 执行，不把新增 $26.45 + 1000 RMB 纳入再平衡。页面只列目标仓位需要买入/补仓的美元金额。</p>
+    </header>
+
+    <section class="grid" aria-label="summary metrics">
+      <article class="card pad span-3">
+        <div class="metric-label">当前美股总值</div>
+        <div class="metric">$1,374.12</div>
+      </article>
+      <article class="card pad span-3">
+        <div class="metric-label">原子弹仓</div>
+        <div class="metric">$433.71</div>
+      </article>
+      <article class="card pad span-3">
+        <div class="metric-label">计划买入合计</div>
+        <div class="metric">$356.85</div>
+      </article>
+      <article class="card pad span-3">
+        <div class="metric-label">买完剩余现金</div>
+        <div class="metric cash">$76.86 <small>5.6%</small></div>
+      </article>
+    </section>
+
+    <section class="card span-12" style="margin-top:12px">
+      <div class="section-title">
+        <h2>需要买入 / 补仓金额</h2>
+        <span class="pill">分母：股票持仓价值 + 子弹型现金</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>标的</th>
+              <th>动作</th>
+              <th>当前仓位</th>
+              <th>目标仓位</th>
+              <th>当前金额</th>
+              <th>目标金额</th>
+              <th>需要买入</th>
+            </tr>
+          </thead>
+          <tbody id="tradeRows"></tbody>
+        </table>
+      </div>
+
+      <div class="mobile-list" id="mobileRows"></div>
+    </section>
+
+    <section class="grid" style="margin-top:12px">
+      <article class="card pad span-4 note-box">
+        <b>执行口径</b>
+        <span>这张表不含新增资金；新增 $26.45 + 1000 RMB 先进入子弹仓，不参与这次目标仓位补齐。</span>
+      </article>
+      <article class="card pad span-4 note-box">
+        <b>冻结仓位</b>
+        <span>NOW 和 TSLA 不主动补到固定比例，随市值自然漂移；MU 暂按现有仓位保留。</span>
+      </article>
+      <article class="card pad span-4 note-box">
+        <b>平台费提醒</b>
+        <span>当前仍在等嘉信开户，因此本页只列原计划金额，不额外拆出“省平台费版本”。</span>
+      </article>
+    </section>
+
+    <footer>最后更新：2026-06-10 · 非投顾建议，仅用于 Jake 的个人交易计划记录。</footer>
+  </main>
+
+  <script>
+    const baseTotal = 1374.12;
+    const trades = [
+      { ticker: 'SPMO', action: '补核心仓', currentPct: 41.43, targetPct: 55, currentValue: 569.30, targetValue: 755.77, buy: 186.47 },
+      { ticker: 'DRAM', action: '补存储主题', currentPct: 8.47, targetPct: 10, currentValue: 116.39, targetValue: 137.41, buy: 21.02 },
+      { ticker: 'MRVL', action: '补 AI/半导体副仓', currentPct: 2.78, targetPct: 5, currentValue: 38.20, targetValue: 68.71, buy: 30.51 },
+      { ticker: 'NOK', action: '补通信副仓', currentPct: 4.35, targetPct: 5, currentValue: 59.77, targetValue: 68.71, buy: 8.93 },
+      { ticker: 'ORCL', action: '新开云/数据库仓', currentPct: 0, targetPct: 3, currentValue: 0, targetValue: 41.22, buy: 41.22 },
+      { ticker: 'CCCJ', action: '新开主题仓', currentPct: 0, targetPct: 2, currentValue: 0, targetValue: 27.48, buy: 27.48 },
+      { ticker: 'CEG', action: '新开电力/核能仓', currentPct: 0, targetPct: 2, currentValue: 0, targetValue: 27.48, buy: 27.48 },
+      { ticker: 'OKLO', action: '新开小型核能仓', currentPct: 0, targetPct: 1, currentValue: 0, targetValue: 13.74, buy: 13.74 },
+    ];
+
+    const money = n => '$' + n.toFixed(2);
+    const pct = n => n.toFixed(2).replace(/\.00$/, '') + '%';
+
+    document.getElementById('tradeRows').innerHTML = trades.map(t => `
+      <tr>
+        <td><div class="ticker">${t.ticker}</div></td>
+        <td><div>${t.action}</div></td>
+        <td>${pct(t.currentPct)}</td>
+        <td>${pct(t.targetPct)}</td>
+        <td>${money(t.currentValue)}</td>
+        <td>${money(t.targetValue)}</td>
+        <td class="buy">${money(t.buy)}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('mobileRows').innerHTML = trades.map(t => `
+      <article class="row-card">
+        <div class="row-head">
+          <div>
+            <div class="ticker">${t.ticker}</div>
+            <div class="tag">${t.action}</div>
+          </div>
+          <div class="row-buy">
+            <span class="buy">${money(t.buy)}</span>
+            <span class="tag">需要买入</span>
+          </div>
+        </div>
+        <div class="kv">
+          <div><b>当前</b><span>${pct(t.currentPct)}</span></div>
+          <div><b>目标</b><span>${pct(t.targetPct)}</span></div>
+          <div><b>目标金额</b><span>${money(t.targetValue)}</span></div>
+        </div>
+      </article>
+    `).join('');
+  </script>
+</body>
+</html>
