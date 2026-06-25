@@ -176,32 +176,32 @@
     <header>
       <div class="eyebrow">Trading Plan · Chief / Schwab pending</div>
       <h1>原组合补仓计划</h1>
-      <p class="sub">只使用原本子弹仓 $433.71 执行，不把新增 $26.45 + 1000 RMB 纳入再平衡。页面只列目标仓位需要买入/补仓的美元金额。</p>
+      <p class="sub">两平台合并计算（致富 + First Trade），用现有现金 $721.77 补齐目标仓位。MU / NOW / TSLA 冻结不动，其余标的按目标比例补仓。</p>
     </header>
 
     <section class="grid" aria-label="summary metrics">
       <article class="card pad span-3">
-        <div class="metric-label">当前美股总值</div>
-        <div class="metric">$1,374.12</div>
+        <div class="metric-label">组合总值（两平台）</div>
+        <div class="metric">$1,813.52</div>
       </article>
       <article class="card pad span-3">
-        <div class="metric-label">原子弹仓</div>
-        <div class="metric">$433.71</div>
+        <div class="metric-label">可用现金</div>
+        <div class="metric">$721.77</div>
       </article>
       <article class="card pad span-3">
         <div class="metric-label">计划买入合计</div>
-        <div class="metric">$356.85</div>
+        <div class="metric">$690.88</div>
       </article>
       <article class="card pad span-3">
         <div class="metric-label">买完剩余现金</div>
-        <div class="metric cash">$76.86 <small>5.6%</small></div>
+        <div class="metric cash">$30.89 <small>1.70%</small></div>
       </article>
     </section>
 
     <section class="card span-12" style="margin-top:12px">
       <div class="section-title">
         <h2>需要买入 / 补仓金额</h2>
-        <span class="pill">分母：股票持仓价值 + 子弹型现金</span>
+        <span class="pill">分母：组合总值（股票 + 现金）</span>
       </div>
 
       <div class="table-wrap">
@@ -225,34 +225,34 @@
     </section>
 
     <section class="grid" style="margin-top:12px">
-      <article class="card pad span-4 note-box">
+      <article class=”card pad span-4 note-box”>
         <b>执行口径</b>
-        <span>这张表不含新增资金；新增 $26.45 + 1000 RMB 先进入子弹仓，不参与这次目标仓位补齐。</span>
+        <span>两平台合并计算，用全部可用现金（致富 $434.41 + First Trade $287.36 = $721.77）补齐目标仓位。</span>
       </article>
-      <article class="card pad span-4 note-box">
+      <article class=”card pad span-4 note-box”>
         <b>冻结仓位</b>
-        <span>NOW 和 TSLA 不主动补到固定比例，随市值自然漂移；MU 暂按现有仓位保留。</span>
+        <span>MU (4.60%)、NOW (2.68%)、TSLA (1.36%) 不主动调仓，随市值自然漂移。</span>
       </article>
-      <article class="card pad span-4 note-box">
-        <b>平台费提醒</b>
-        <span>当前仍在等嘉信开户，因此本页只列原计划金额，不额外拆出“省平台费版本”。</span>
+      <article class=”card pad span-4 note-box”>
+        <b>平台状态</b>
+        <span>致富 + First Trade 双平台运营中，本页金额不区分平台，执行时按各平台可用现金分配。</span>
       </article>
     </section>
 
-    <footer>最后更新：2026-06-10 · 非投顾建议，仅用于 Jake 的个人交易计划记录。</footer>
+    <footer>最后更新：2026-06-25 · 非投顾建议，仅用于 Jake 的个人交易计划记录。</footer>
   </main>
 
   <script>
-    const baseTotal = 1374.12;
+    const baseTotal = 1813.52;
     const trades = [
-      { ticker: 'SPMO', action: '补核心仓', currentPct: 41.43, targetPct: 55, currentValue: 569.30, targetValue: 755.77, buy: 186.47 },
-      { ticker: 'DRAM', action: '补存储主题', currentPct: 8.47, targetPct: 10, currentValue: 116.39, targetValue: 137.41, buy: 21.02 },
-      { ticker: 'MRVL', action: '补 AI/半导体副仓', currentPct: 2.78, targetPct: 5, currentValue: 38.20, targetValue: 68.71, buy: 30.51 },
-      { ticker: 'NOK', action: '补通信副仓', currentPct: 4.35, targetPct: 5, currentValue: 59.77, targetValue: 68.71, buy: 8.93 },
-      { ticker: 'ORCL', action: '新开云/数据库仓', currentPct: 0, targetPct: 3, currentValue: 0, targetValue: 41.22, buy: 41.22 },
-      { ticker: 'CCCJ', action: '新开主题仓', currentPct: 0, targetPct: 2, currentValue: 0, targetValue: 27.48, buy: 27.48 },
-      { ticker: 'CEG', action: '新开电力/核能仓', currentPct: 0, targetPct: 2, currentValue: 0, targetValue: 27.48, buy: 27.48 },
-      { ticker: 'OKLO', action: '新开小型核能仓', currentPct: 0, targetPct: 1, currentValue: 0, targetValue: 13.74, buy: 13.74 },
+      { ticker: 'SPMO', action: '补核心仓', currentPct: 33.47, targetPct: 55, currentValue: 607.17, targetValue: 997.44, buy: 390.27 },
+      { ticker: 'DRAM', action: '补存储主题', currentPct: 9.20, targetPct: 15, currentValue: 166.87, targetValue: 272.03, buy: 105.16 },
+      { ticker: 'MRVL', action: '补 AI/半导体副仓', currentPct: 2.34, targetPct: 3, currentValue: 42.38, targetValue: 54.41, buy: 12.03 },
+      { ticker: 'NOK', action: '补通信副仓', currentPct: 3.10, targetPct: 3, currentValue: 56.16, targetValue: 54.41, buy: 0 },
+      { ticker: 'AAOI', action: '补光通信仓', currentPct: 2.77, targetPct: 3, currentValue: 50.27, targetValue: 54.41, buy: 4.14 },
+      { ticker: 'MU', action: '冻结', currentPct: 4.60, targetPct: 5, currentValue: 83.45, targetValue: 90.68, buy: 0 },
+      { ticker: 'NOW', action: '冻结', currentPct: 2.68, targetPct: 3.46, currentValue: 48.51, targetValue: 62.75, buy: 0 },
+      { ticker: 'TSLA', action: '冻结', currentPct: 1.36, targetPct: 2, currentValue: 24.71, targetValue: 36.27, buy: 0 },
     ];
 
     const money = n => '$' + n.toFixed(2);
