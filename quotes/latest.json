@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-03T20:44:27.107283+00:00",
+  "updated_at": "2026-08-03T22:12:20.940663+00:00",
   "symbols": [
     "SPMO",
     "DRAM",
@@ -18,23 +18,150 @@
     "SOXX",
     "UUP"
   ],
-  "quotes": {},
+  "quotes": {
+    "SPMO": {
+      "c": 145.35,
+      "d": 1.52,
+      "dp": 1.0568,
+      "h": 145.78,
+      "l": 141.2,
+      "o": 142.26,
+      "pc": 143.83,
+      "t": 1785787200
+    },
+    "DRAM": {
+      "c": 51.13,
+      "d": 0.76,
+      "dp": 1.5088,
+      "h": 51.57,
+      "l": 47.68,
+      "o": 49,
+      "pc": 50.37,
+      "t": 1785787200
+    },
+    "NOK": {
+      "c": 9.36,
+      "d": 0.22,
+      "dp": 2.407,
+      "h": 9.43,
+      "l": 8.77,
+      "o": 8.875,
+      "pc": 9.14,
+      "t": 1785787200
+    },
+    "MU": {
+      "c": 829.5,
+      "d": 6.47,
+      "dp": 0.7861,
+      "h": 836.62,
+      "l": 770.1,
+      "o": 786.355,
+      "pc": 823.03,
+      "t": 1785787200
+    },
+    "NOW": {
+      "c": 114.19,
+      "d": 2.96,
+      "dp": 2.6612,
+      "h": 119.64,
+      "l": 113.7,
+      "o": 114.51,
+      "pc": 111.23,
+      "t": 1785787200
+    },
+    "QQQ": {
+      "c": 700.07,
+      "d": 12.08,
+      "dp": 1.7558,
+      "h": 701.59,
+      "l": 685.82,
+      "o": 688.3,
+      "pc": 687.99,
+      "t": 1785787200
+    },
+    "SPY": {
+      "c": 757.67,
+      "d": 10.64,
+      "dp": 1.4243,
+      "h": 758.58,
+      "l": 748.8,
+      "o": 749.44,
+      "pc": 747.03,
+      "t": 1785787200
+    },
+    "SMH": {
+      "c": 545.46,
+      "d": 4.93,
+      "dp": 0.9121,
+      "h": 548.49,
+      "l": 524.77,
+      "o": 530.43,
+      "pc": 540.53,
+      "t": 1785787200
+    },
+    "SOXX": {
+      "c": 507.68,
+      "d": 2.79,
+      "dp": 0.5526,
+      "h": 510.95,
+      "l": 485.71,
+      "o": 491.92,
+      "pc": 504.89,
+      "t": 1785787200
+    },
+    "XLV": {
+      "c": 162.24,
+      "d": -0.31,
+      "dp": -0.1907,
+      "h": 164.73,
+      "l": 161.35,
+      "o": 163.63,
+      "pc": 162.55,
+      "t": 1785787200
+    },
+    "XLP": {
+      "c": 84.86,
+      "d": -0.19,
+      "dp": -0.2234,
+      "h": 86.34,
+      "l": 84.63,
+      "o": 85.92,
+      "pc": 85.05,
+      "t": 1785787200
+    },
+    "XLU": {
+      "c": 44.36,
+      "d": 0.01,
+      "dp": 0.0225,
+      "h": 44.66,
+      "l": 43.94,
+      "o": 44.24,
+      "pc": 44.35,
+      "t": 1785787200
+    },
+    "XLE": {
+      "c": 58.79,
+      "d": -0.76,
+      "dp": -1.2762,
+      "h": 59.325,
+      "l": 58.16,
+      "o": 58.69,
+      "pc": 59.55,
+      "t": 1785787200
+    },
+    "UUP": {
+      "c": 28.17,
+      "d": 0,
+      "dp": 0,
+      "h": 28.19,
+      "l": 28.11,
+      "o": 28.11,
+      "pc": 28.17,
+      "t": 1785787200
+    }
+  },
   "errors": {
-    "SPMO": "HTTPError: HTTP Error 502: Bad Gateway",
-    "DRAM": "HTTPError: HTTP Error 502: Bad Gateway",
-    "NOK": "HTTPError: HTTP Error 502: Bad Gateway",
-    "MU": "HTTPError: HTTP Error 502: Bad Gateway",
-    "NOW": "HTTPError: HTTP Error 502: Bad Gateway",
-    "QQQ": "HTTPError: HTTP Error 502: Bad Gateway",
-    "SPY": "HTTPError: HTTP Error 502: Bad Gateway",
-    "SMH": "HTTPError: HTTP Error 502: Bad Gateway",
-    "SOXX": "HTTPError: HTTP Error 502: Bad Gateway",
-    "XLV": "HTTPError: HTTP Error 502: Bad Gateway",
-    "XLP": "HTTPError: HTTP Error 502: Bad Gateway",
-    "XLU": "HTTPError: HTTP Error 502: Bad Gateway",
-    "XLE": "HTTPError: HTTP Error 502: Bad Gateway",
-    "^VIX": "HTTPError: HTTP Error 502: Bad Gateway",
-    "UUP": "HTTPError: HTTP Error 502: Bad Gateway"
+    "^VIX": "Market data subscription required for CFD indices."
   },
   "market": {
     "USDCNY": 6.759763,
