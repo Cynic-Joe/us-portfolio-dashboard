@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-04T20:11:17.265185+00:00",
+  "updated_at": "2026-08-04T21:50:18.929550+00:00",
   "symbols": [
     "SPMO",
     "DRAM",
@@ -129,6 +129,16 @@
       "pc": 84.86,
       "t": 1785873600
     },
+    "XLU": {
+      "c": 44.11,
+      "d": -0.25,
+      "dp": -0.5636,
+      "h": 44.29,
+      "l": 43.585,
+      "o": 44.25,
+      "pc": 44.36,
+      "t": 1785873600
+    },
     "XLE": {
       "c": 58.52,
       "d": -0.27,
@@ -151,7 +161,6 @@
     }
   },
   "errors": {
-    "XLU": "TimeoutError: The read operation timed out",
     "^VIX": "Market data subscription required for CFD indices."
   },
   "market": {
