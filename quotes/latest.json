@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-31T04:55:02.829020+00:00",
+  "updated_at": "2026-08-31T11:30:02.730237+00:00",
   "symbols": [
     "SPMO",
     "DRAM",
@@ -19,16 +19,6 @@
     "UUP"
   ],
   "quotes": {
-    "SPMO": {
-      "c": 146.78,
-      "d": -1.82,
-      "dp": -1.2248,
-      "h": 148.8,
-      "l": 146.45,
-      "o": 148.22,
-      "pc": 148.6,
-      "t": 1787947200
-    },
     "DRAM": {
       "c": 55.83,
       "d": -1,
@@ -59,16 +49,6 @@
       "pc": 935.39,
       "t": 1787947200
     },
-    "NOW": {
-      "c": 144.71,
-      "d": 6.28,
-      "dp": 4.5366,
-      "h": 145.72,
-      "l": 137.8,
-      "o": 138.48,
-      "pc": 138.43,
-      "t": 1787947200
-    },
     "QQQ": {
       "c": 716.43,
       "d": -4.68,
@@ -89,16 +69,6 @@
       "pc": 771.1,
       "t": 1787947200
     },
-    "SMH": {
-      "c": 553.11,
-      "d": -19.89,
-      "dp": -3.4712,
-      "h": 570.12,
-      "l": 552.3,
-      "o": 568.72,
-      "pc": 573,
-      "t": 1787947200
-    },
     "SOXX": {
       "c": 508.62,
       "d": -16.81,
@@ -107,26 +77,6 @@
       "l": 506.82,
       "o": 521.2,
       "pc": 525.43,
-      "t": 1787947200
-    },
-    "XLV": {
-      "c": 171.16,
-      "d": -0.42,
-      "dp": -0.2448,
-      "h": 171.71,
-      "l": 170.585,
-      "o": 171.43,
-      "pc": 171.58,
-      "t": 1787947200
-    },
-    "XLP": {
-      "c": 85.45,
-      "d": 0.37,
-      "dp": 0.4349,
-      "h": 85.605,
-      "l": 85.21,
-      "o": 85.5,
-      "pc": 85.08,
       "t": 1787947200
     },
     "XLU": {
@@ -138,30 +88,18 @@
       "o": 43.34,
       "pc": 43.18,
       "t": 1787947200
-    },
-    "XLE": {
-      "c": 62.68,
-      "d": 0.39,
-      "dp": 0.6261,
-      "h": 62.74,
-      "l": 62.118,
-      "o": 62.35,
-      "pc": 62.29,
-      "t": 1787947200
-    },
-    "UUP": {
-      "c": 28.18,
-      "d": 0.16,
-      "dp": 0.571,
-      "h": 28.2,
-      "l": 28.01,
-      "o": 28.03,
-      "pc": 28.02,
-      "t": 1787947200
     }
   },
   "errors": {
-    "^VIX": "Market data subscription required for CFD indices."
+    "SPMO": "HTTPError: HTTP Error 503: Service Unavailable",
+    "NOW": "HTTPError: HTTP Error 503: Service Unavailable",
+    "SMH": "HTTPError: HTTP Error 503: Service Unavailable",
+    "XLV": "HTTPError: HTTP Error 503: Service Unavailable",
+    "XLP": "HTTPError: HTTP Error 503: Service Unavailable",
+    "XLE": "HTTPError: HTTP Error 503: Service Unavailable",
+    "^VIX": "HTTPError: HTTP Error 503: Service Unavailable",
+    "SOXX": "HTTPError: HTTP Error 503: Service Unavailable",
+    "UUP": "HTTPError: HTTP Error 503: Service Unavailable"
   },
   "market": {
     "USDCNY": 6.735761,
