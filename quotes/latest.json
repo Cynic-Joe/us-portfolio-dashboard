@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-18T23:31:20.119906+00:00",
+  "updated_at": "2026-09-19T04:06:01.112036+00:00",
   "symbols": [
     "SPMO",
     "DRAM",
@@ -164,9 +164,9 @@
     "^VIX": "Market data subscription required for CFD indices."
   },
   "market": {
-    "USDCNY": 6.721845,
-    "USDHKD": 7.845183,
-    "forex_date": "Fri, 18 Sep 2026 00:02:31 +0000",
+    "USDCNY": 6.714087,
+    "USDHKD": 7.845123,
+    "forex_date": "Sat, 19 Sep 2026 00:02:31 +0000",
     "yield10y": null
   }
 }
